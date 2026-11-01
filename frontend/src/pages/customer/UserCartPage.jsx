@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { ShoppingBag, Trash2, ArrowRight, ShieldCheck, CheckCircle2, AlertTriangle, Sparkles, MapPin, FileText } from 'lucide-react';
 import { PixelIcon } from '../../components/PixelArt';
+import ProductImage from '../../components/ProductImage';
 import { api } from '../../services/api';
 import { sound } from '../../utils/audioSynth';
 
@@ -248,12 +249,11 @@ export default function UserCartPage({ onNavigate, onOrderCompleted }) {
               >
                 {/* Product Image */}
                 <div className="w-16 h-16 rounded-xl bg-purple-950/40 border border-purple-500/20 flex items-center justify-center shrink-0">
-                  <img
-                    src={item.image_url || '/images/default_potion.png'}
-                    alt={item.name}
-                    className="max-h-12 max-w-12 object-contain"
-                    style={{ imageRendering: 'pixelated' }}
-                    onError={(e) => { e.target.style.display = 'none'; }}
+                  <ProductImage
+                    name={item.name}
+                    imageUrl={item.image_url}
+                    category={item.category_name}
+                    size={48}
                   />
                 </div>
 

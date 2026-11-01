@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Search, Filter, ShoppingBag, Sparkles, X, ChevronRight, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { PixelIcon } from '../../components/PixelArt';
+import ProductImage from '../../components/ProductImage';
 import { api } from '../../services/api';
 import { sound } from '../../utils/audioSynth';
 
@@ -202,12 +203,12 @@ export default function UserShopPage({ onAddToCart }) {
                     onClick={() => handleOpenDetail(product.id)}
                     className="w-full h-36 rounded-xl bg-purple-950/30 border border-purple-500/20 flex items-center justify-center p-3 relative cursor-pointer overflow-hidden group-hover:bg-purple-950/40 transition-all"
                   >
-                    <img
-                      src={product.image_url || '/images/default_potion.png'}
-                      alt={product.name}
-                      className="max-h-24 max-w-24 object-contain group-hover:scale-110 transition-transform duration-300"
-                      style={{ imageRendering: 'pixelated' }}
-                      onError={(e) => { e.target.style.display = 'none'; }}
+                    <ProductImage
+                      name={product.name}
+                      imageUrl={product.image_url}
+                      category={product.category_name}
+                      size={88}
+                      className="group-hover:scale-108 transition-transform duration-300 ease-out"
                     />
 
                     {/* Stock Status Pill */}
@@ -313,12 +314,11 @@ export default function UserShopPage({ onAddToCart }) {
 
             <div className="flex flex-col sm:flex-row items-center gap-5">
               <div className="w-28 h-28 rounded-2xl bg-purple-950/50 border border-purple-500/30 flex items-center justify-center p-3 shrink-0">
-                <img
-                  src={selectedProduct.image_url || '/images/default_potion.png'}
-                  alt={selectedProduct.name}
-                  className="max-h-20 max-w-20 object-contain"
-                  style={{ imageRendering: 'pixelated' }}
-                  onError={(e) => { e.target.style.display = 'none'; }}
+                <ProductImage
+                  name={selectedProduct.name}
+                  imageUrl={selectedProduct.image_url}
+                  category={selectedProduct.category_name}
+                  size={96}
                 />
               </div>
 

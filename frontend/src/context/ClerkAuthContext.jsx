@@ -17,13 +17,27 @@ const ClerkAuthContext = createContext({
 function ClerkAuthInner({ children }) {
   const { isLoaded, isSignedIn, userId, sessionId, getToken, signOut } = useAuth();
   const { user: clerkUser } = useUser();
-  const { signIn } = useSignIn();
+  const { signIn, isLoaded: isSignInLoaded } = useSignIn();
 
   const signInWithGoogle = async () => {
-    if (!signIn) {
-      throw new Error('Clerk Sign-In service is initializing. Please try again.');
+    let activeSignIn = signIn || (typeof window !== 'undefined' && window.Clerk?.client?.signIn);
+    
+    // If not immediately available, wait briefly for Clerk client hydration
+    if (!activeSignIn && typeof window !== 'undefined' && window.Clerk) {
+      for (let i = 0; i < 20; i++) {
+        if (window.Clerk?.client?.signIn) {
+          activeSignIn = window.Clerk.client.signIn;
+          break;
+        }
+        await new Promise(r => setTimeout(r, 100));
+      }
     }
-    return signIn.authenticateWithRedirect({
+
+    if (!activeSignIn) {
+      throw new Error('Clerk Sign-In service is initializing. Please try again in a moment.');
+    }
+
+    return activeSignIn.authenticateWithRedirect({
       strategy: 'oauth_google',
       redirectUrl: `${window.location.origin}/?tab=sso-callback`,
       redirectUrlComplete: `${window.location.origin}/?tab=login`

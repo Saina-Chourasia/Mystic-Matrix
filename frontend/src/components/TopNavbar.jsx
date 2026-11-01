@@ -178,7 +178,7 @@ export default function TopNavbar({
               {(user?.avatar_url || user?.picture) && !avatarError ? (
                 <img
                   src={user.avatar_url || user.picture}
-                  alt={user?.name || "Admin"}
+                  alt=""
                   className="w-full h-full object-cover"
                   onError={() => setAvatarError(true)}
                 />

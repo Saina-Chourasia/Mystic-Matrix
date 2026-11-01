@@ -47,6 +47,12 @@ export function getCustomApiHost() {
 export function getImageUrl(path) {
     if (!path) return '';
     if (path.startsWith('http://') || path.startsWith('https://')) return path;
+
+    // In web browsers, serve local public assets directly from the frontend host/CDN
+    if (typeof window !== 'undefined' && typeof Capacitor !== 'undefined' && !Capacitor.isNativePlatform()) {
+        return path.startsWith('/') ? path : `/${path}`;
+    }
+
     const base = getApiBaseUrl();
     return `${base}${path.startsWith('/') ? path : `/${path}`}`;
 }
