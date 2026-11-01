@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Mystic Matrix</string>
+    <string name="title_activity_main">Mystic Matrix</string>
+    <string name="package_name">com.mysticmatrix.app</string>
+    <string name="custom_url_scheme">com.mysticmatrix.app</string>
+</resources>

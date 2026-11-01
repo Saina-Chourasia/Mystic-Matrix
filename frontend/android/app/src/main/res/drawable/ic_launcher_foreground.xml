@@ -1,0 +1,58 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Cauldron Body -->
+    <path
+        android:fillColor="#240046"
+        android:strokeColor="#9D4EDD"
+        android:strokeWidth="2"
+        android:pathData="M34,54 C34,74 44,82 54,82 C64,82 74,74 74,54 Z" />
+        
+    <!-- Cauldron Rim -->
+    <path
+        android:fillColor="#3C096C"
+        android:strokeColor="#C77DFF"
+        android:strokeWidth="1.5"
+        android:pathData="M30,51 L78,51 C80,51 80,55 78,55 L30,55 C28,55 28,51 30,51 Z" />
+        
+    <!-- Magical Potion Brew Bubbling (Emerald Green Glow) -->
+    <path
+        android:fillColor="#10B981"
+        android:pathData="M33,53 C40,51 48,54 54,53 C60,52 68,54 75,53 C73,56 68,57 54,57 C40,57 35,56 33,53 Z" />
+
+    <!-- Witch Hat Cone -->
+    <path
+        android:fillColor="#7B2CBF"
+        android:strokeColor="#E0AAFF"
+        android:strokeWidth="1.5"
+        android:pathData="M54,22 L40,44 L68,44 Z" />
+
+    <!-- Witch Hat Tip Crook -->
+    <path
+        android:fillColor="#5A189A"
+        android:pathData="M54,22 C52,19 49,18 47,20 C48,22 51,23 54,25 Z" />
+
+    <!-- Witch Hat Golden Ribbon Band -->
+    <path
+        android:fillColor="#F5BA42"
+        android:pathData="M38,41 L70,41 L69,45 L39,45 Z" />
+        
+    <!-- Golden Mystic Star / Buckle -->
+    <path
+        android:fillColor="#FFD166"
+        android:pathData="M54,40 L55.5,43 L59,43 L56,45 L57,48 L54,46 L51,48 L52,45 L49,43 L52.5,43 Z" />
+
+    <!-- Magical Rising Bubbles -->
+    <path
+        android:fillColor="#34D399"
+        android:pathData="M46,47 A2,2 0 1,1 46,46.9 Z" />
+    <path
+        android:fillColor="#6EE7B7"
+        android:pathData="M58,48 A1.5,1.5 0 1,1 58,47.9 Z" />
+    <path
+        android:fillColor="#A7F3D0"
+        android:pathData="M52,49 A1,1 0 1,1 52,48.9 Z" />
+</vector>

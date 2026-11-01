@@ -1,0 +1,65 @@
+const { DatabaseSync } = require('node:sqlite');
+const path = require('node:path');
+const fs = require('node:fs');
+
+const DB_PATH = process.env.DB_PATH || path.resolve(__dirname, '../../database/hexventory.db');
+const SCHEMA_PATH = path.resolve(__dirname, '../../database/schemas/schema.sql');
+const SEED_MODULE = path.resolve(__dirname, '../../database/seed/seedData.js');
+
+let dbInstance = null;
+
+function getDb() {
+    if (dbInstance) {
+        return dbInstance;
+    }
+
+    const dbExists = fs.existsSync(DB_PATH);
+    dbInstance = new DatabaseSync(DB_PATH);
+
+    if (!dbExists) {
+        console.log('🪄 No database found at', DB_PATH, '- Initializing schema & seeding...');
+        const { initDatabase, seedData } = require(SEED_MODULE);
+        seedData(dbInstance);
+    } else {
+        // Ensure foreign keys are enabled
+        dbInstance.exec('PRAGMA foreign_keys = ON;');
+        
+        // Ensure Migration 003 is present
+        const hasUsers = dbInstance.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='users'").get();
+        if (!hasUsers) {
+            try {
+                const { runMigration } = require('../../database/migrations/run_003_migration');
+                runMigration();
+            } catch (mErr) {
+                console.error('Auto-migration 003 error:', mErr.message);
+            }
+        }
+
+        // Ensure Migration 005 (AI Agent Tables) is present
+        const hasAiNotifs = dbInstance.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='ai_notifications'").get();
+        if (!hasAiNotifs) {
+            try {
+                const { runMigration: run005 } = require('../../database/migrations/run_005_migration');
+                run005(dbInstance);
+            } catch (mErr) {
+                console.error('Auto-migration 005 error:', mErr.message);
+            }
+        }
+
+        // Ensure Clerk ID column is present on users
+        try {
+            const userCols = dbInstance.prepare("PRAGMA table_info(users)").all();
+            if (!userCols.some(c => c.name === 'clerk_id')) {
+                dbInstance.exec("ALTER TABLE users ADD COLUMN clerk_id TEXT;");
+                dbInstance.exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_clerk_id ON users(clerk_id) WHERE clerk_id IS NOT NULL;");
+            }
+        } catch (cErr) {
+            // Ignore if already altered
+        }
+    }
+
+    return dbInstance;
+}
+
+module.exports = { getDb, DB_PATH };
+

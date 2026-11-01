@@ -1,0 +1,30 @@
+# Node dependencies
+node_modules/
+.pnpm/
+
+# Build artifacts
+dist/
+build/
+
+# Environment files
+.env
+.env.*
+*.env
+backend/.env
+backend/.env.*
+frontend/.env
+frontend/.env.*
+.env.local
+
+# Database storage
+database/*.db
+database/*.db-journal
+database/*.db-wal
+database/*.db-shm
+
+# System and Editor files
+.DS_Store
+*.log
+.vscode/
+.idea/
+

@@ -1,0 +1,402 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════════════════════
+   THEME VARIABLES & 8-BIT DESIGN SYSTEM
+   ═══════════════════════════════════════════════════════════════ */
+
+:root, .theme-night {
+  /* Night Mode (Halloween Apothecary) */
+  --bg-primary: #0B0416;
+  --bg-secondary: #130826;
+  --bg-card: rgba(21, 10, 38, 0.85);
+  --bg-card-solid: #150A26;
+  --bg-card-hover: #1E0F38;
+  --bg-input: #0E051D;
+  --border-card: rgba(157, 78, 221, 0.28);
+  --border-strong: #9D4EDD;
+  --border-pixel: #2A134A;
+  
+  --text-primary: #F4EBD9;
+  --text-secondary: #A89EAF;
+  --text-muted: #72657C;
+  
+  --color-orange: #FF6B2B;
+  --color-orange-hover: #FF854D;
+  --color-orange-subtle: rgba(255, 107, 43, 0.15);
+  
+  --color-gold: #F5BA42;
+  --color-gold-hover: #FFCD60;
+  --color-gold-subtle: rgba(245, 186, 66, 0.15);
+  
+  --color-purple: #9D4EDD;
+  --color-purple-deep: #240046;
+  --color-purple-subtle: rgba(157, 78, 221, 0.18);
+  
+  --color-emerald: #10B981;
+  --color-emerald-subtle: rgba(16, 185, 129, 0.15);
+  --color-crimson: #EF4444;
+  --color-crimson-subtle: rgba(239, 68, 68, 0.15);
+  
+  --chart-grid: rgba(157, 78, 221, 0.15);
+  --chart-tooltip-bg: #150A26;
+  --chart-tooltip-border: #9D4EDD;
+  
+  --pixel-shadow: rgba(0, 0, 0, 0.6);
+  --landing-gradient-top: rgba(157, 78, 221, 0.12);
+  --landing-gradient-bottom: rgba(255, 107, 43, 0.08);
+}
+
+.theme-day {
+  /* Day Mode (Magical Sunlit Library) */
+  --bg-primary: #FAF7F2;
+  --bg-secondary: #F2ECE1;
+  --bg-card: rgba(255, 255, 255, 0.95);
+  --bg-card-solid: #FFFFFF;
+  --bg-card-hover: #FDFBF7;
+  --bg-input: #F8F5EE;
+  --border-card: #E4DCEF;
+  --border-strong: #8A5BB5;
+  --border-pixel: #D3C5E5;
+  
+  --text-primary: #231634;
+  --text-secondary: #5E526B;
+  --text-muted: #8E829B;
+  
+  --color-orange: #E05C1D;
+  --color-orange-hover: #C94C12;
+  --color-orange-subtle: rgba(224, 92, 29, 0.12);
+  
+  --color-gold: #B8860B;
+  --color-gold-hover: #9E7309;
+  --color-gold-subtle: rgba(184, 134, 11, 0.12);
+  
+  --color-purple: #7E38B7;
+  --color-purple-deep: #EDE4F8;
+  --color-purple-subtle: rgba(126, 56, 183, 0.12);
+  
+  --color-emerald: #059669;
+  --color-emerald-subtle: rgba(5, 150, 105, 0.12);
+  --color-crimson: #DC2626;
+  --color-crimson-subtle: rgba(220, 38, 38, 0.12);
+  
+  --chart-grid: rgba(126, 56, 183, 0.12);
+  --chart-tooltip-bg: #FFFFFF;
+  --chart-tooltip-border: #8A5BB5;
+  
+  --pixel-shadow: rgba(35, 22, 52, 0.2);
+  --landing-gradient-top: rgba(237, 228, 248, 0.6);
+  --landing-gradient-bottom: rgba(254, 238, 224, 0.6);
+}
+
+/* Base Body */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Outfit', sans-serif;
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PIXEL-ART & RETRO TYPOGRAPHY TOKENS
+   ═══════════════════════════════════════════════════════════════ */
+
+.font-pixel {
+  font-family: 'Press Start 2P', monospace;
+  letter-spacing: -0.05em;
+}
+
+.font-silkscreen {
+  font-family: 'Silkscreen', monospace;
+}
+
+.font-serif {
+  font-family: 'Cinzel', serif;
+}
+
+.font-sans {
+  font-family: 'Outfit', sans-serif;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Pixel rendering for images and SVGs */
+.pixelated {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   8-BIT RETRO BOXES & BUTTONS (SaaS + Retro Balance)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Pixel-notched Modern Card */
+.pixel-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px -2px var(--pixel-shadow);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.pixel-card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -4px var(--pixel-shadow);
+}
+
+.pixel-card-static {
+  background: var(--bg-card);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px -2px var(--pixel-shadow);
+}
+
+/* Authentic 8-Bit Pixel Frame */
+.pixel-frame {
+  box-shadow: 
+    0 -3px 0 0 var(--border-pixel),
+    0 3px 0 0 var(--border-pixel),
+    -3px 0 0 0 var(--border-pixel),
+    3px 0 0 0 var(--border-pixel);
+  margin: 3px;
+  background: var(--bg-card);
+}
+
+/* 8-Bit Primary Action Button */
+.pixel-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--color-orange);
+  color: #FFFFFF;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  border-top: 2px solid rgba(255, 255, 255, 0.4);
+  border-left: 2px solid rgba(255, 255, 255, 0.4);
+  border-bottom: 3px solid rgba(0, 0, 0, 0.4);
+  border-right: 3px solid rgba(0, 0, 0, 0.4);
+  box-shadow: 0 3px 0 0 var(--pixel-shadow);
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  user-select: none;
+}
+
+.pixel-btn-primary:hover {
+  background: var(--color-orange-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 0 var(--pixel-shadow);
+}
+
+.pixel-btn-primary:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 0 var(--pixel-shadow);
+}
+
+/* 8-Bit Gold Button */
+.pixel-btn-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--color-gold);
+  color: #1A0E2A;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  border-top: 2px solid rgba(255, 255, 255, 0.6);
+  border-left: 2px solid rgba(255, 255, 255, 0.6);
+  border-bottom: 3px solid rgba(0, 0, 0, 0.3);
+  border-right: 3px solid rgba(0, 0, 0, 0.3);
+  box-shadow: 0 3px 0 0 var(--pixel-shadow);
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  user-select: none;
+  font-weight: bold;
+}
+
+.pixel-btn-gold:hover {
+  background: var(--color-gold-hover);
+  transform: translateY(-1px);
+}
+
+.pixel-btn-gold:active {
+  transform: translateY(2px);
+}
+
+/* 8-Bit Secondary / Ghost Button */
+.pixel-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-family: 'Silkscreen', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: 1px solid var(--border-card);
+  box-shadow: 0 2px 0 0 var(--pixel-shadow);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pixel-btn-secondary:hover {
+  border-color: var(--border-strong);
+  color: var(--color-orange);
+  background: var(--color-orange-subtle);
+  transform: translateY(-1px);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RETRO PIXEL STATUS BADGES
+   ═══════════════════════════════════════════════════════════════ */
+
+.pixel-badge-critical {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  padding: 4px 8px;
+  background: var(--color-crimson-subtle);
+  color: var(--color-crimson);
+  border: 1px solid var(--color-crimson);
+  border-radius: 4px;
+}
+
+.pixel-badge-low {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  padding: 4px 8px;
+  background: var(--color-orange-subtle);
+  color: var(--color-orange);
+  border: 1px solid var(--color-orange);
+  border-radius: 4px;
+}
+
+.pixel-badge-overstock {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  padding: 4px 8px;
+  background: var(--color-purple-subtle);
+  color: var(--color-purple);
+  border: 1px solid var(--color-purple);
+  border-radius: 4px;
+}
+
+.pixel-badge-healthy {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  padding: 4px 8px;
+  background: var(--color-emerald-subtle);
+  color: var(--color-emerald);
+  border: 1px solid var(--color-emerald);
+  border-radius: 4px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SUBTLE RETRO ANIMATIONS
+   ═══════════════════════════════════════════════════════════════ */
+
+@keyframes float-pixel {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes pixel-step {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+.animate-pixel-float {
+  animation: float-pixel 3.5s ease-in-out infinite;
+}
+
+.animate-pixel-step {
+  animation: pixel-step 1.2s steps(2, end) infinite;
+}
+
+.animate-star {
+  animation: star-twinkle 2s ease-in-out infinite;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-card);
+  border-radius: 4px;
+  border: 1px solid var(--border-pixel);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-orange);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE & SAFE AREA ADAPTATIONS (CAPACITOR ANDROID)
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+}
+
+body {
+  padding-top: var(--sat);
+  padding-bottom: var(--sab);
+  padding-left: var(--sal);
+  padding-right: var(--sar);
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+.pt-safe {
+  padding-top: max(var(--sat), 12px);
+}
+
+.pb-safe {
+  padding-bottom: max(var(--sab), 12px);
+}
+
+.mobile-scroll-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+@media (pointer: coarse) {
+  button, a, input, select {
+    min-height: 40px;
+  }
+  
+  .touch-target-sm {
+    min-height: 36px;
+    min-width: 36px;
+  }
+}

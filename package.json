@@ -1,0 +1,42 @@
+{
+  "name": "mystic-matrix",
+  "version": "2.0.0",
+  "description": "MYSTIC MATRIX - The Enchanted Inventory for Every Potion and Prophecy",
+  "main": "backend/server.js",
+  "scripts": {
+    "build": "cd frontend && npm run build",
+    "start": "cd backend && node server.js",
+    "seed": "node database/seed/seedData.js",
+    "dev:backend": "cd backend && node server.js",
+    "dev:frontend": "cd frontend && npm run dev",
+    "android:sync": "cd frontend && npm run build && npx cap sync android",
+    "android:build": "export JAVA_HOME=\"$HOME/.local/jdk-17/Contents/Home\" && export ANDROID_HOME=\"$HOME/Library/Android/sdk\" && cd frontend/android && ./gradlew assembleDebug --no-daemon",
+    "android:build:release": "export JAVA_HOME=\"$HOME/.local/jdk-17/Contents/Home\" && export ANDROID_HOME=\"$HOME/Library/Android/sdk\" && cd frontend/android && ./gradlew assembleRelease --no-daemon",
+    "android:open": "cd frontend && npx cap open android"
+  },
+  "keywords": [
+    "inventory-management",
+    "demand-forecasting",
+    "halloween",
+    "pixel-art",
+    "8-bit",
+    "react",
+    "sqlite",
+    "express"
+  ],
+  "author": "Madam Hex Dev Team",
+  "license": "MIT",
+  "devDependencies": {
+    "puppeteer": "^25.16.0"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "express-rate-limit": "^8.7.2",
+    "groq-sdk": "^1.6.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@clerk/shared"
+    ]
+  }
+}
