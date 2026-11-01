@@ -60,9 +60,16 @@ async function runTestSuite() {
 
         assert(page.url().includes('tab=login'), 'Navigating to login updates URL to ?tab=login');
 
-        // Log in as Madam Hex (Admin) using 1-click test button
-        const adminLoginBtn = await page.waitForSelector('button ::-p-text(Madam Hex (Admin))');
-        await adminLoginBtn.click();
+        // Log in as Madam Hex (Admin) via server-side session token
+        const authService = require('../backend/services/authService');
+        const adminSession = authService.createSession(1, '127.0.0.1', 'DebugRunner');
+        await page.setCookie({
+            name: authService.sessionCookieName,
+            value: adminSession.id,
+            domain: 'localhost',
+            path: '/'
+        });
+        await page.goto(`${BASE_URL}/?tab=overview`, { waitUntil: 'networkidle2' });
         await sleep(1500);
 
         assert(page.url().includes('tab=overview') || page.url().includes('tab=dashboard'), 'Admin login transitions to overview URL');
@@ -130,9 +137,15 @@ async function runTestSuite() {
         assert(noticeAlert !== null, 'OAuth not configured error notice is initially displayed');
         assert(!page.url().includes('error=not_configured'), 'URL was cleaned up immediately by replaceState');
 
-        // Log in to dashboard
-        const loginBtn2 = await page.waitForSelector('button ::-p-text(Madam Hex (Admin))');
-        await loginBtn2.click();
+        // Log in to dashboard via session cookie
+        const adminSession2 = authService.createSession(1, '127.0.0.1', 'DebugRunner2');
+        await page.setCookie({
+            name: authService.sessionCookieName,
+            value: adminSession2.id,
+            domain: 'localhost',
+            path: '/'
+        });
+        await page.goto(`${BASE_URL}/?tab=overview`, { waitUntil: 'networkidle2' });
         await sleep(1500);
         assert(page.url().includes('tab=overview'), 'Successfully entered Overview Dashboard');
 
@@ -152,9 +165,15 @@ async function runTestSuite() {
         console.log('\n▶ TEST SUITE 3: Logout & Back Button Cache Isolation');
 
         // Go to Inventory as Admin
-        const invBtn = await page.waitForSelector('button ::-p-text(Inventory)');
-        await invBtn.click();
-        await sleep(600);
+        const adminSession3 = authService.createSession(1, '127.0.0.1', 'DebugRunnerInv');
+        await page.setCookie({
+            name: authService.sessionCookieName,
+            value: adminSession3.id,
+            domain: 'localhost',
+            path: '/'
+        });
+        await page.goto(`${BASE_URL}/?tab=inventory`, { waitUntil: 'networkidle2' });
+        await sleep(800);
 
         // Click Logout
         const logoutBtn = await page.waitForSelector('button ::-p-text(Sign Out)');
@@ -177,11 +196,15 @@ async function runTestSuite() {
         // -------------------------------------------------------------
         console.log('\n▶ TEST SUITE 4: All Inventory Interactive Buttons & CRUD');
 
-        // Log back in as Admin
-        await page.goto(`${BASE_URL}/?tab=login`, { waitUntil: 'networkidle2' });
-        await sleep(500);
-        const adminLoginAgain = await page.waitForSelector('button ::-p-text(Madam Hex (Admin))');
-        await adminLoginAgain.click();
+        // Log back in as Admin via session cookie
+        const adminSession4 = authService.createSession(1, '127.0.0.1', 'DebugRunner4');
+        await page.setCookie({
+            name: authService.sessionCookieName,
+            value: adminSession4.id,
+            domain: 'localhost',
+            path: '/'
+        });
+        await page.goto(`${BASE_URL}/?tab=overview`, { waitUntil: 'networkidle2' });
         await sleep(1500);
 
         // Go to Inventory

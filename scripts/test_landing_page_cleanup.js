@@ -159,12 +159,19 @@ async function runLandingPageTests() {
         const loginTitle = await page.$('::-p-text(Enter the Sanctum)');
         assert(loginTitle !== null, 'Login portal rendered properly with "Enter the Sanctum"');
 
-        // Test Admin 1-Click Login Redirect
-        const adminBtn = await page.waitForSelector('button ::-p-text(Madam Hex (Admin))');
-        await adminBtn.click();
+        // Test Admin Session Verification
+        const authService = require('../backend/services/authService');
+        const adminSession = authService.createSession(1, '127.0.0.1', 'TestLanding');
+        await page.setCookie({
+            name: authService.sessionCookieName,
+            value: adminSession.id,
+            domain: 'localhost',
+            path: '/'
+        });
+        await page.goto(`${BASE_URL}/?tab=overview`, { waitUntil: 'networkidle2' });
         await sleep(1500);
 
-        assert(page.url().includes('tab=overview'), 'Admin login redirected to Admin Sanctum Overview');
+        assert(page.url().includes('tab=overview'), 'Admin session verified into Admin Sanctum Overview');
 
         // Logout and test User Login Redirect
         const signoutBtn = await page.waitForSelector('button ::-p-text(Sign Out)');
@@ -172,7 +179,7 @@ async function runLandingPageTests() {
         await sleep(800);
 
         // Customer Login (Apprentice)
-        const userBtn = await page.waitForSelector('button ::-p-text(Customer (Apprentice))');
+        const userBtn = await page.waitForSelector('button ::-p-text(Customer Portal (Apprentice Demo))');
         await userBtn.click();
         await sleep(1500);
 

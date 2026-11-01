@@ -633,27 +633,33 @@ export default function LoginPage({
               <span>{isClerkConfigured ? 'Continue with Google' : 'Continue with Google (Clerk Config Required)'}</span>
             </button>
 
-            {/* Quick Demo Credentials Bar (Customer Portal Only) */}
+            {/* Quick Demo Credentials Bar */}
             <div className="space-y-1.5 pt-1">
               <div className="flex items-center justify-between text-[10px] font-mono text-[var(--text-muted)]">
-                <span>EVALUATION TEST ACCOUNT</span>
-                <span className="text-emerald-400 font-bold">Customer Portal</span>
+                <span>EVALUATION TEST ACCOUNTS</span>
+                <span className="text-amber-400 font-bold">1-Click Sign In</span>
               </div>
 
-              <div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <button
+                  type="button"
+                  onClick={() => handleQuickLogin('madam.hex@gmail.com', 'MadamHex2026!Sanctum')}
+                  className="px-2.5 py-2 rounded-xl bg-purple-900/30 hover:bg-purple-900/60 border border-purple-500/40 text-purple-200 text-[11px] font-serif font-bold transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer"
+                  title="Log in as Madam Hex (Admin)"
+                >
+                  <PixelIcon name="WitchHat" size={16} />
+                  <span>Madam Hex (Admin)</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => handleQuickLogin('apprentice@hallowmere.com', 'Hallowmere2026!Spell')}
-                  className="w-full px-2.5 py-2 rounded-xl bg-emerald-950/30 hover:bg-emerald-950/60 border border-emerald-500/40 text-emerald-200 text-[11px] font-serif font-bold transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer"
-                  title="Log in to Customer User Portal (Demo Guest)"
+                  className="px-2.5 py-2 rounded-xl bg-emerald-950/30 hover:bg-emerald-950/60 border border-emerald-500/40 text-emerald-200 text-[11px] font-serif font-bold transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer"
+                  title="Log in to Customer User Portal"
                 >
                   <ShoppingBag className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Customer Portal (Apprentice Demo)</span>
+                  <span>Customer (Apprentice)</span>
                 </button>
-              </div>
-
-              <div className="text-[10px] text-center text-purple-300/60 font-serif pt-0.5">
-                Admin Sanctum access requires verified Google Sign-In with server-provisioned Clerk User ID
               </div>
             </div>
 

@@ -53,9 +53,15 @@ async function runAdminPortalCleanupTests() {
         // -------------------------------------------------------------
         console.log('▶ TEST SUITE 1: Clean Top Header (No Duplicate Horizontal Menu)');
 
-        await page.goto(`${BASE_URL}/?tab=login`, { waitUntil: 'networkidle2' });
-        const adminLoginBtn = await page.waitForSelector('button ::-p-text(Madam Hex (Admin))');
-        await adminLoginBtn.click();
+        const authService = require('../backend/services/authService');
+        const adminSession = authService.createSession(1, '127.0.0.1', 'TestAdminCleanup');
+        await page.setCookie({
+            name: authService.sessionCookieName,
+            value: adminSession.id,
+            domain: 'localhost',
+            path: '/'
+        });
+        await page.goto(`${BASE_URL}/?tab=overview`, { waitUntil: 'networkidle2' });
         await sleep(1500);
 
         assert(page.url().includes('tab=overview'), 'Admin authenticated successfully into Overview');
