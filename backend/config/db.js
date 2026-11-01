@@ -2,9 +2,19 @@ const { DatabaseSync } = require('node:sqlite');
 const path = require('node:path');
 const fs = require('node:fs');
 
-const DB_PATH = process.env.DB_PATH || path.resolve(__dirname, '../../database/hexventory.db');
-const SCHEMA_PATH = path.resolve(__dirname, '../../database/schemas/schema.sql');
-const SEED_MODULE = path.resolve(__dirname, '../../database/seed/seedData.js');
+function resolveDbPath(relPath) {
+    const p1 = path.resolve(__dirname, '../', relPath);
+    if (fs.existsSync(p1)) return p1;
+    const p2 = path.resolve(__dirname, '../../', relPath);
+    if (fs.existsSync(p2)) return p2;
+    return p1;
+}
+
+const DB_PATH = process.env.DB_PATH || resolveDbPath('database/hexventory.db');
+const SCHEMA_PATH = resolveDbPath('database/schemas/schema.sql');
+const SEED_MODULE = resolveDbPath('database/seed/seedData.js');
+const MIGRATION_003 = resolveDbPath('database/migrations/run_003_migration.js');
+const MIGRATION_005 = resolveDbPath('database/migrations/run_005_migration.js');
 
 let dbInstance = null;
 
@@ -28,7 +38,7 @@ function getDb() {
         const hasUsers = dbInstance.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='users'").get();
         if (!hasUsers) {
             try {
-                const { runMigration } = require('../../database/migrations/run_003_migration');
+                const { runMigration } = require(MIGRATION_003);
                 runMigration();
             } catch (mErr) {
                 console.error('Auto-migration 003 error:', mErr.message);
@@ -39,7 +49,7 @@ function getDb() {
         const hasAiNotifs = dbInstance.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='ai_notifications'").get();
         if (!hasAiNotifs) {
             try {
-                const { runMigration: run005 } = require('../../database/migrations/run_005_migration');
+                const { runMigration: run005 } = require(MIGRATION_005);
                 run005(dbInstance);
             } catch (mErr) {
                 console.error('Auto-migration 005 error:', mErr.message);

@@ -64,9 +64,11 @@ if (clerkService.isConfigured()) {
     console.log('ℹ️  [Auth] Clerk credentials not set. Native session & password auth active. Configure CLERK_SECRET_KEY to enable Clerk.');
 }
 
-// Path to frontend production build
+// Path to frontend production build & static images
 const frontendDist = path.resolve(__dirname, '../frontend/dist');
-const frontendPublicImages = path.resolve(__dirname, '../frontend/public/images');
+const localImages = path.resolve(__dirname, 'public/images');
+const monorepoImages = path.resolve(__dirname, '../frontend/public/images');
+const frontendPublicImages = fs.existsSync(localImages) ? localImages : monorepoImages;
 
 // Serve static images & public assets
 app.use('/images', express.static(frontendPublicImages));

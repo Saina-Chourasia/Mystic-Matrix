@@ -1,5 +1,18 @@
 const authService = require('../services/authService');
 
+function getCookieConfig(isHttpOnly = true) {
+    const isProduction = process.env.NODE_ENV === 'production';
+    const isCrossDomain = Boolean(process.env.FRONTEND_URL || process.env.COOKIE_SAME_SITE === 'none');
+
+    return {
+        httpOnly: isHttpOnly,
+        secure: isProduction || isCrossDomain,
+        sameSite: isCrossDomain ? 'none' : 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        path: '/'
+    };
+}
+
 class AuthController {
     /**
      * Get Public Auth Configuration
@@ -49,22 +62,10 @@ class AuthController {
             });
 
             // Set secure, HTTP-only session cookie
-            res.cookie(authService.sessionCookieName, session.id, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                maxAge: 7 * 24 * 60 * 60 * 1000,
-                path: '/'
-            });
+            res.cookie(authService.sessionCookieName, session.id, getCookieConfig(true));
 
             // Set CSRF token cookie for frontend mutation headers
-            res.cookie('mystic_csrf', session.csrf_token, {
-                httpOnly: false,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                maxAge: 7 * 24 * 60 * 60 * 1000,
-                path: '/'
-            });
+            res.cookie('mystic_csrf', session.csrf_token, getCookieConfig(false));
 
             res.status(201).json({
                 success: true,
@@ -98,31 +99,13 @@ class AuthController {
             });
 
             // Set secure, HTTP-only session cookie
-            res.cookie(authService.sessionCookieName, session.id, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                maxAge: 7 * 24 * 60 * 60 * 1000,
-                path: '/'
-            });
+            res.cookie(authService.sessionCookieName, session.id, getCookieConfig(true));
 
             // Set backward compatible cookie for legacy checks
-            res.cookie(authService.legacySessionCookieName, session.id, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                maxAge: 7 * 24 * 60 * 60 * 1000,
-                path: '/'
-            });
+            res.cookie(authService.legacySessionCookieName, session.id, getCookieConfig(true));
 
             // Set CSRF token cookie
-            res.cookie('mystic_csrf', session.csrf_token, {
-                httpOnly: false,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                maxAge: 7 * 24 * 60 * 60 * 1000,
-                path: '/'
-            });
+            res.cookie('mystic_csrf', session.csrf_token, getCookieConfig(false));
 
             res.json({
                 success: true,
@@ -418,29 +401,9 @@ class AuthController {
             });
 
             // Set secure session cookies for seamless session continuity
-            res.cookie(authService.sessionCookieName, session.id, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                maxAge: 7 * 24 * 60 * 60 * 1000,
-                path: '/'
-            });
-
-            res.cookie(authService.legacySessionCookieName, session.id, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                maxAge: 7 * 24 * 60 * 60 * 1000,
-                path: '/'
-            });
-
-            res.cookie('mystic_csrf', session.csrf_token, {
-                httpOnly: false,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                maxAge: 7 * 24 * 60 * 60 * 1000,
-                path: '/'
-            });
+            res.cookie(authService.sessionCookieName, session.id, getCookieConfig(true));
+            res.cookie(authService.legacySessionCookieName, session.id, getCookieConfig(true));
+            res.cookie('mystic_csrf', session.csrf_token, getCookieConfig(false));
 
             res.json({
                 success: true,

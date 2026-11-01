@@ -1,6 +1,12 @@
+const path = require('node:path');
+const fs = require('node:fs');
 const AnalyticsService = require('../services/analyticsService');
 const { getDb } = require('../config/db');
-const { seedData } = require('../../database/seed/seedData');
+
+const seedModulePath = fs.existsSync(path.resolve(__dirname, '../database/seed/seedData.js'))
+    ? path.resolve(__dirname, '../database/seed/seedData.js')
+    : path.resolve(__dirname, '../../database/seed/seedData.js');
+const { seedData } = require(seedModulePath);
 
 class AnalyticsController {
     static getDashboardMetrics(req, res) {

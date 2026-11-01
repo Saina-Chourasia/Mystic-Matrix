@@ -192,7 +192,22 @@ function verifyCsrfToken(req, res, next) {
             const isNativeCapacitorOrigin = origin.startsWith('capacitor://') ||
                                             origin.startsWith('ionic://') ||
                                             (parsedOrigin.hostname === 'localhost' && (origin.startsWith('http://') || origin.startsWith('https://')));
-            if (!isNativeCapacitorOrigin && parsedOrigin.host !== host) {
+
+            // Allow origins defined in FRONTEND_URL or ALLOWED_ORIGINS (e.g., https://mystic-matrix.vercel.app)
+            const allowedOriginsEnv = (process.env.ALLOWED_ORIGINS || process.env.FRONTEND_URL || '')
+                .split(',')
+                .map(s => s.trim().replace(/\/+$/, ''))
+                .filter(Boolean);
+
+            const isConfiguredFrontendOrigin = allowedOriginsEnv.some(allowed => {
+                try {
+                    return new URL(allowed).host === parsedOrigin.host;
+                } catch (e) {
+                    return allowed === origin;
+                }
+            }) || (parsedOrigin.hostname.endsWith('.vercel.app'));
+
+            if (!isNativeCapacitorOrigin && !isConfiguredFrontendOrigin && parsedOrigin.host !== host) {
                 return res.status(403).json({
                     success: false,
                     error: 'CSRF_ORIGIN_MISMATCH',

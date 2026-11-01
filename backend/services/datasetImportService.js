@@ -8,7 +8,9 @@ const datasetModel = require('../models/datasetModel');
 class DatasetImportService {
     constructor() {
         this.datasetKey = 'uci_online_retail_ii';
-        this.filePath = path.resolve(__dirname, '../../database/datasets/online_retail_II.xlsx');
+        const p1 = path.resolve(__dirname, '../database/datasets/online_retail_II.xlsx');
+        const p2 = path.resolve(__dirname, '../../database/datasets/online_retail_II.xlsx');
+        this.filePath = fs.existsSync(p1) ? p1 : p2;
     }
 
     /**
