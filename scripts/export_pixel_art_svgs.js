@@ -100,3 +100,4 @@ for (const item of itemsToExport) {
 }
 
 console.log(`\n✨ Successfully generated ${count} original pixel-art SVG assets across all directories!`);
+
