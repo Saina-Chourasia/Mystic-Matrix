@@ -456,9 +456,12 @@ export default function App() {
 
           if (res.success && res.user) {
             handleLoginSuccess(res.user);
+          } else if (res.message) {
+            showToast(res.message, 'error');
           }
         } catch (err) {
           console.error('Clerk backend synchronization error:', err);
+          showToast(err.message || 'Clerk synchronization failed.', 'error');
         }
       }
       syncClerkSession();

@@ -26,6 +26,7 @@ export default function TopNavbar({
   onOpenOracleChat,
   onOpenApprovals
 }) {
+  const [avatarError, setAvatarError] = React.useState(false);
   const isNight = theme === 'night';
 
   const pageTitles = {
@@ -174,10 +175,17 @@ export default function TopNavbar({
               className="w-8 h-8 rounded-full border border-[var(--color-purple)] overflow-hidden flex items-center justify-center bg-[var(--bg-primary)] shadow-sm hover:ring-2 hover:ring-[var(--color-purple)] transition-all"
               title={user?.email ? `Signed in as ${user.email} (Admin)` : "Madam Hex's Profile"}
             >
-              {user?.avatar_url || user?.picture ? (
-                <img src={user.avatar_url || user.picture} alt="Admin" className="w-full h-full object-cover" />
+              {(user?.avatar_url || user?.picture) && !avatarError ? (
+                <img
+                  src={user.avatar_url || user.picture}
+                  alt={user?.name || "Admin"}
+                  className="w-full h-full object-cover"
+                  onError={() => setAvatarError(true)}
+                />
               ) : (
-                <User className="w-4 h-4 text-[var(--color-purple)]" />
+                <div className="w-full h-full flex items-center justify-center bg-purple-950/60 text-purple-300">
+                  <PixelIcon name="WitchHat" size={16} />
+                </div>
               )}
             </button>
 

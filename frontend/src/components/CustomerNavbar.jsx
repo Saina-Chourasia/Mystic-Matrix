@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ShoppingBag, Sun, Moon, LogOut, Shield, Compass, Sparkles, Package, UserCheck } from 'lucide-react';
 import { PixelIcon } from './PixelArt';
 import { sound } from '../utils/audioSynth';
@@ -13,6 +13,7 @@ export default function CustomerNavbar({
   onLogout,
   onSwitchToAdmin
 }) {
+  const [avatarError, setAvatarError] = useState(false);
   const isNight = theme === 'night';
 
   const navItems = [
@@ -136,8 +137,13 @@ export default function CustomerNavbar({
             title="View Profile"
           >
             <div className="w-6 h-6 rounded-lg bg-purple-600/30 border border-purple-500/40 flex items-center justify-center text-xs font-serif font-bold text-purple-200 overflow-hidden">
-              {user?.avatar_url || user?.picture ? (
-                <img src={user.avatar_url || user.picture} alt="Avatar" className="w-full h-full object-cover" />
+              {(user?.avatar_url || user?.picture) && !avatarError ? (
+                <img
+                  src={user.avatar_url || user.picture}
+                  alt={user?.name || "Avatar"}
+                  className="w-full h-full object-cover"
+                  onError={() => setAvatarError(true)}
+                />
               ) : (
                 user?.name?.[0] || 'A'
               )}
