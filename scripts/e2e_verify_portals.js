@@ -6,6 +6,7 @@ const SCREENSHOT_DIR = path.resolve(__dirname, '../docs/screenshots');
 if (!fs.existsSync(SCREENSHOT_DIR)) {
     fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
 }
+const BASE_URL = 'http://localhost:5001';
 
 async function run() {
     console.log('🔮 Starting End-to-End Browser Verification with Puppeteer...\n');
