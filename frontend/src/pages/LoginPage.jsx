@@ -183,7 +183,7 @@ export default function LoginPage({
     }
   };
 
-  // Google OAuth Flow powered by Clerk Authentication
+  // Google OAuth Flow (Powered by Clerk Authentication with seamless Native OAuth Fallback)
   const handleContinueWithGoogle = async () => {
     sound.playCastSpell();
     setErrorMessage(null);
@@ -198,10 +198,19 @@ export default function LoginPage({
         setErrorMessage(err.message || 'Clerk Google Sign-In could not be initialized.');
         setLoading(false);
       }
+    } else if (authConfig?.googleConfigured) {
+      try {
+        setLoading(true);
+        window.location.href = api.getGoogleLoginUrl();
+      } catch (err) {
+        sound.playWarningHex();
+        setErrorMessage(err.message || 'Failed to initiate Google OAuth.');
+        setLoading(false);
+      }
     } else {
       sound.playWarningHex();
       setErrorMessage(
-        'Clerk Authentication is pending configuration. Please set VITE_CLERK_PUBLISHABLE_KEY (frontend/.env) and CLERK_SECRET_KEY (backend/.env) from dashboard.clerk.com.'
+        'Google Authentication is pending configuration. Please verify Clerk publishable key or Google OAuth credentials.'
       );
     }
   };

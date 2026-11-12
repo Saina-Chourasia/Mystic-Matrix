@@ -207,7 +207,10 @@ export default function App() {
           window.history.replaceState({ tab: initialTab }, '', initialUrl);
         } else {
           setAuth({ checked: true, authenticated: false, user: null });
-          if (requestedTab !== 'welcome') {
+          if (requestedTab === 'sso-callback') {
+            // Keep sso-callback active so Clerk's AuthenticateWithRedirectCallback can complete
+            setActiveTab('sso-callback');
+          } else if (requestedTab !== 'welcome') {
             setActiveTab('login');
             window.history.replaceState({ tab: 'login' }, '', '/?tab=login');
           } else {
@@ -218,13 +221,29 @@ export default function App() {
       } catch (err) {
         console.error('Session check failed:', err);
         setAuth({ checked: true, authenticated: false, user: null });
-        if (requestedTab !== 'welcome') {
+        if (requestedTab === 'sso-callback') {
+          setActiveTab('sso-callback');
+        } else if (requestedTab !== 'welcome') {
           setActiveTab('login');
         }
       }
     }
     checkSession();
   }, []);
+
+  // 1a. Safety timeout for SSO callback tab to avoid getting stuck if external handshake fails
+  useEffect(() => {
+    if (activeTab === 'sso-callback') {
+      const timeout = setTimeout(() => {
+        if (!auth.authenticated && !isClerkSignedIn) {
+          showToast('Authentication timed out. Returning to sanctum sign in.', 'warning');
+          setActiveTab('login');
+          window.history.replaceState({ tab: 'login' }, '', '/?tab=login');
+        }
+      }, 10000);
+      return () => clearTimeout(timeout);
+    }
+  }, [activeTab, auth.authenticated, isClerkSignedIn]);
 
   // 1b. Seamless Browser Back & Forward Navigation Listener (popstate)
   useEffect(() => {

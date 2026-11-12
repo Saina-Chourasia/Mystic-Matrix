@@ -47,6 +47,9 @@ async function resolveUser(req) {
                 if (verified && verified.sub) {
                     const user = userModel.findByClerkId(verified.sub);
                     if (user) {
+                        if (typeof user.preferences === 'string') {
+                            try { user.preferences = JSON.parse(user.preferences); } catch (e) { user.preferences = {}; }
+                        }
                         req.user = user;
                         return user;
                     }
@@ -235,6 +238,8 @@ function verifyCsrfToken(req, res, next) {
 }
 
 module.exports = {
+    resolveUser,
+    extractSessionId,
     optionalSession,
     requireAuth,
     requireRole,

@@ -24,6 +24,17 @@ class AuthService {
         return (process.env.ADMIN_EMAIL || 'madam.hex@gmail.com').trim().toLowerCase();
     }
 
+    getAdminEmails() {
+        const configured = (process.env.ADMIN_EMAIL || '').trim().toLowerCase();
+        const emails = new Set(['madam.hex@gmail.com', 'sainasakshi@gmail.com']);
+        if (configured) {
+            configured.split(',').forEach(e => {
+                if (e.trim()) emails.add(e.trim().toLowerCase());
+            });
+        }
+        return emails;
+    }
+
     getSessionSecret() {
         return process.env.SESSION_SECRET || 'mystic-matrix-enchanted-apothecary-session-secret-2026';
     }
@@ -457,8 +468,8 @@ class AuthService {
         let user = userModel.findByEmail(email);
 
         if (!user) {
-            // New user via Google OAuth -> USER role (unless matching ADMIN_EMAIL)
-            const isAdmin = email === this.getAdminEmail();
+            // New user via Google OAuth -> USER role (unless matching ADMIN_EMAIL / authorized admin set)
+            const isAdmin = this.getAdminEmails().has(email);
             const randomPassword = crypto.randomBytes(24).toString('hex');
             user = userModel.create({
                 email,

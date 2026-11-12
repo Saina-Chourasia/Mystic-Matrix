@@ -1,8 +1,9 @@
 const authService = require('../services/authService');
+const { resolveUser, extractSessionId } = require('../middleware/authMiddleware');
 
 function getCookieConfig(isHttpOnly = true) {
     const isProduction = process.env.NODE_ENV === 'production';
-    const isCrossDomain = Boolean(process.env.FRONTEND_URL || process.env.COOKIE_SAME_SITE === 'none');
+    const isCrossDomain = Boolean(process.env.FRONTEND_URL || process.env.COOKIE_SAME_SITE === 'none' || isProduction);
 
     return {
         httpOnly: isHttpOnly,
@@ -124,60 +125,58 @@ class AuthController {
 
     /**
      * Check Current Session / Profile (/api/auth/me)
+     * Seamlessly verifies Clerk JWT, traditional session ID header, or session cookie
      */
-    getMe(req, res) {
-        let sessionId = null;
-        if (req.cookies) {
-            sessionId = req.cookies[authService.sessionCookieName] || req.cookies[authService.legacySessionCookieName];
-        }
-        if (!sessionId && req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
-            sessionId = req.headers.authorization.substring(7).trim();
-        }
+    async getMe(req, res) {
+        try {
+            const user = await resolveUser(req);
+            if (!user) {
+                return res.json({
+                    success: true,
+                    authenticated: false,
+                    user: null
+                });
+            }
 
-        if (!sessionId) {
+            return res.json({
+                success: true,
+                authenticated: true,
+                user,
+                csrfToken: user.csrf_token || null
+            });
+        } catch (err) {
+            console.error('[getMe] Session verification error:', err);
             return res.json({
                 success: true,
                 authenticated: false,
                 user: null
             });
         }
-
-        const user = authService.verifySession(sessionId);
-        if (!user) {
-            res.clearCookie(authService.sessionCookieName, { path: '/' });
-            res.clearCookie(authService.legacySessionCookieName, { path: '/' });
-            res.clearCookie('mystic_csrf', { path: '/' });
-            return res.json({
-                success: true,
-                authenticated: false,
-                user: null
-            });
-        }
-
-        res.json({
-            success: true,
-            authenticated: true,
-            user,
-            csrfToken: user.csrf_token
-        });
     }
 
     /**
      * Logout & Terminate Session
      */
     logout(req, res) {
-        let sessionId = null;
-        if (req.cookies) {
-            sessionId = req.cookies[authService.sessionCookieName] || req.cookies[authService.legacySessionCookieName];
-        }
+        let sessionId = extractSessionId(req);
         const userId = req.user ? req.user.id : null;
         const ipAddress = req.ip || req.connection.remoteAddress;
 
-        authService.logout(sessionId, userId, ipAddress);
+        if (sessionId) {
+            authService.logout(sessionId, userId, ipAddress);
+        }
 
-        res.clearCookie(authService.sessionCookieName, { path: '/' });
-        res.clearCookie(authService.legacySessionCookieName, { path: '/' });
-        res.clearCookie('mystic_csrf', { path: '/' });
+        const isProduction = process.env.NODE_ENV === 'production';
+        const isCrossDomain = Boolean(process.env.FRONTEND_URL || process.env.COOKIE_SAME_SITE === 'none' || isProduction);
+        const clearCookieConfig = {
+            path: '/',
+            secure: isProduction || isCrossDomain,
+            sameSite: isCrossDomain ? 'none' : 'lax'
+        };
+
+        res.clearCookie(authService.sessionCookieName, clearCookieConfig);
+        res.clearCookie(authService.legacySessionCookieName, clearCookieConfig);
+        res.clearCookie('mystic_csrf', clearCookieConfig);
 
         res.json({
             success: true,
@@ -256,27 +255,9 @@ class AuthController {
                 userAgent
             });
 
-            res.cookie(authService.sessionCookieName, session.id, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                maxAge: 7 * 24 * 60 * 60 * 1000,
-                path: '/'
-            });
-            res.cookie(authService.legacySessionCookieName, session.id, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                maxAge: 7 * 24 * 60 * 60 * 1000,
-                path: '/'
-            });
-            res.cookie('mystic_csrf', session.csrf_token, {
-                httpOnly: false,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                maxAge: 7 * 24 * 60 * 60 * 1000,
-                path: '/'
-            });
+            res.cookie(authService.sessionCookieName, session.id, getCookieConfig(true));
+            res.cookie(authService.legacySessionCookieName, session.id, getCookieConfig(true));
+            res.cookie('mystic_csrf', session.csrf_token, getCookieConfig(false));
 
             res.json({
                 success: true,
@@ -298,24 +279,19 @@ class AuthController {
      * Initiate Google OAuth
      */
     initiateGoogleAuth(req, res) {
+        const frontendUrl = (process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/+$/, '');
         try {
             if (!authService.isGoogleOAuthConfigured()) {
-                return res.redirect('/login?error=not_configured');
+                return res.redirect(`${frontendUrl}/?tab=login&error=not_configured`);
             }
 
             const { url, state } = authService.generateGoogleAuthUrl();
 
-            res.cookie(authService.oauthStateCookieName, state, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                maxAge: 10 * 60 * 1000,
-                path: '/'
-            });
+            res.cookie(authService.oauthStateCookieName, state, getCookieConfig(true));
 
             res.redirect(url);
         } catch (err) {
-            res.redirect('/login?error=oauth_init_failed');
+            res.redirect(`${frontendUrl}/?tab=login&error=oauth_init_failed`);
         }
     }
 
@@ -324,51 +300,37 @@ class AuthController {
      */
     async handleGoogleCallback(req, res) {
         const { code, state, error } = req.query;
+        const frontendUrl = (process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/+$/, '');
 
         if (error) {
-            return res.redirect(`/login?error=${encodeURIComponent(error)}`);
+            return res.redirect(`${frontendUrl}/?tab=login&error=${encodeURIComponent(error)}`);
         }
 
         const savedState = req.cookies && req.cookies[authService.oauthStateCookieName];
-        res.clearCookie(authService.oauthStateCookieName, { path: '/' });
+        const isProduction = process.env.NODE_ENV === 'production';
+        const isCrossDomain = Boolean(process.env.FRONTEND_URL || process.env.COOKIE_SAME_SITE === 'none' || isProduction);
+        res.clearCookie(authService.oauthStateCookieName, {
+            path: '/',
+            secure: isProduction || isCrossDomain,
+            sameSite: isCrossDomain ? 'none' : 'lax'
+        });
 
         if (!state || !savedState || state !== savedState) {
-            return res.redirect('/login?error=state_mismatch');
+            return res.redirect(`${frontendUrl}/?tab=login&error=state_mismatch`);
         }
 
         try {
             const user = await authService.handleGoogleCallback(code);
             const session = authService.createSession(user.id, req.ip);
 
-            res.cookie(authService.sessionCookieName, session.id, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                maxAge: 7 * 24 * 60 * 60 * 1000,
-                path: '/'
-            });
-            res.cookie(authService.legacySessionCookieName, session.id, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                maxAge: 7 * 24 * 60 * 60 * 1000,
-                path: '/'
-            });
-            res.cookie('mystic_csrf', session.csrf_token, {
-                httpOnly: false,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                maxAge: 7 * 24 * 60 * 60 * 1000,
-                path: '/'
-            });
+            res.cookie(authService.sessionCookieName, session.id, getCookieConfig(true));
+            res.cookie(authService.legacySessionCookieName, session.id, getCookieConfig(true));
+            res.cookie('mystic_csrf', session.csrf_token, getCookieConfig(false));
 
-            if (user.role === 'ADMIN') {
-                return res.redirect('/admin/dashboard?auth=success');
-            } else {
-                return res.redirect('/user/dashboard?auth=success');
-            }
+            const targetTab = user.role === 'ADMIN' ? 'overview' : 'user_dashboard';
+            return res.redirect(`${frontendUrl}/?tab=${targetTab}&auth=success`);
         } catch (err) {
-            return res.redirect(`/login?error=oauth_exchange_failed&msg=${encodeURIComponent(err.message)}`);
+            return res.redirect(`${frontendUrl}/?tab=login&error=oauth_exchange_failed&msg=${encodeURIComponent(err.message)}`);
         }
     }
 

@@ -149,7 +149,7 @@ export const api = {
     resetPassword: (data) => request('/auth/reset-password', { method: 'POST', body: data }),
     devLogin: (data) => request('/auth/dev-login', { method: 'POST', body: data }),
     syncClerkUser: (data) => request('/auth/clerk-sync', { method: 'POST', body: data }),
-    getGoogleLoginUrl: () => `${API_BASE}/auth/google`,
+    getGoogleLoginUrl: () => `${getApiBaseUrl()}/api/auth/google`,
 
     // Health
     getHealth: () => request('/health'),
